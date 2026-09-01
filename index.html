@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event QR Code Creator</title>
+<meta name="description" content="Create a QR code for your event that lets anyone add it straight to their calendar with a scan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles/styles.css">
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a href="./index.html" class="nav-brand">WebSweetWeb Event QR</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="./index.html" class="nav-link" aria-current="page">Event QR</a></li>
+      <li><a href="./about.html" class="nav-link">About</a></li>
+      <li><a href="./contact.html" class="nav-link">Contact</a></li>
+      <li><a href="https://websweetweb.us" class="nav-link">WSW</a></li>
+    </ul>
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">▦</span>
+    <span class="brand-name">Event QR Creator</span>
+  </div>
+  <p class="header-tagline">Turn any event into a scannable "Add to Calendar" code.</p>
+</header>
+
+<main id="main-content">
+  <div class="layout">
+
+    <section class="form-card" aria-labelledby="form-heading">
+      <h1 id="form-heading">Event Details</h1>
+      <p class="form-intro">Fill in your event, then generate a QR code anyone can scan to add it to their calendar.</p>
+
+      <form id="eventForm" novalidate>
+
+        <div class="field">
+          <label for="eventTitle">Event Title <span class="required" aria-hidden="true">*</span></label>
+          <input type="text" id="eventTitle" name="eventTitle" required maxlength="200" autocomplete="off" aria-describedby="eventTitleError">
+          <p class="field-error" id="eventTitleError" role="alert"></p>
+        </div>
+
+        <div class="field-row">
+          <div class="field location-field">
+            <label for="eventLocation" id="locationLabel">Event Location</label>
+            <input type="text" id="eventLocation" name="eventLocation" maxlength="200" autocomplete="off">
+            <select id="mooseLodgeLocation" name="mooseLodgeLocation" aria-labelledby="locationLabel" hidden>
+              <option value="">Select a lodge…</option>
+              <optgroup label="California — Bellflower">
+                <option value="Bellflower Lodge #796, 9320 Alondra Blvd, Bellflower, CA, 90706">Lodge #796 – 9320 Alondra Blvd</option>
+              </optgroup>
+              <optgroup label="California — Burbank">
+                <option value="Burbank Lodge #652, 1901 W Burbank Blvd, Burbank, CA, 91506">Lodge #652 – 1901 W Burbank Blvd</option>
+              </optgroup>
+              <optgroup label="California — El Monte">
+                <option value="El Monte Lodge #1097, 4249 Peck Rd, El Monte, CA, 91732">Lodge #1097 – 4249 Peck Rd</option>
+              </optgroup>
+              <optgroup label="California — El Segundo">
+                <option value="Westchester/El Segundo Lodge #1780, 514 W Imperial Ave, El Segundo, CA, 90245">Lodge #1780 – 514 W Imperial Ave</option>
+              </optgroup>
+              <optgroup label="California — Hawthorne">
+                <option value="Hawthorne Lodge #1746, 13212 Inglewood Ave, Hawthorne, CA, 90250">Lodge #1746 – 13212 Inglewood Ave</option>
+              </optgroup>
+              <optgroup label="California — Redondo Beach">
+                <option value="Redondo Beach Lodge #1873, 516 N Pacific Coast Hwy, Redondo Beach, CA, 90277">Lodge #1873 – 516 N Pacific Coast Hwy</option>
+              </optgroup>
+              <optgroup label="California — Reseda">
+                <option value="Reseda Lodge #1738, 17751 Saticoy St, Reseda, CA, 91335">Lodge #1738 – 17751 Saticoy St</option>
+              </optgroup>
+              <optgroup label="California — Santa Monica">
+                <option value="Santa Monica Lodge #702, 1600 Ocean Park Blvd, Santa Monica, CA, 90405">Lodge #702 – 1600 Ocean Park Blvd</option>
+              </optgroup>
+              <optgroup label="California — Sylmar">
+                <option value="San Fernando Valley Lodge #1522, 12178 San Fernando Rd, Sylmar, CA, 91342">Lodge #1522 – 12178 San Fernando Rd</option>
+              </optgroup>
+              <optgroup label="California — Torrance">
+                <option value="Torrance Lodge #785, 1020 Sartori Ave, Torrance, CA, 90501">Lodge #785 – 1020 Sartori Ave</option>
+              </optgroup>
+            </select>
+            <p class="field-hint" id="lodgeListHint" hidden>Covers confirmed Moose International lodges in LA County — not guaranteed exhaustive.</p>
+          </div>
+
+          <div class="toggle-field">
+            <span class="toggle-text" id="mooseLodgeLabel">Is this a Moose Lodge event?</span>
+            <button type="button" class="toggle-switch" id="mooseLodge" role="switch" aria-checked="false" aria-labelledby="mooseLodgeLabel">
+              <span class="toggle-thumb" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="field checkbox-field">
+          <input type="checkbox" id="allDay" name="allDay">
+          <label for="allDay">This is an all-day event</label>
+        </div>
+
+        <fieldset class="field datetime-field">
+          <legend>Event Start Date and Time <span class="required" aria-hidden="true">*</span></legend>
+          <div class="datetime-row">
+            <div class="date-input">
+              <label for="startDate" class="visually-hidden">Start date</label>
+              <input type="date" id="startDate" name="startDate" required aria-describedby="startDateError">
+            </div>
+            <div class="time-input" id="startTimeGroup">
+              <label for="startHour" class="visually-hidden">Start hour</label>
+              <select id="startHour" name="startHour" aria-label="Start hour">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12" selected>12</option>
+              </select>
+              <span class="time-sep" aria-hidden="true">:</span>
+              <label for="startMinute" class="visually-hidden">Start minute</label>
+              <select id="startMinute" name="startMinute" aria-label="Start minute"></select>
+              <label for="startAmPm" class="visually-hidden">Start AM or PM</label>
+              <select id="startAmPm" name="startAmPm" aria-label="Start AM or PM">
+                <option value="AM">AM</option>
+                <option value="PM" selected>PM</option>
+              </select>
+            </div>
+          </div>
+          <p class="field-error" id="startDateError" role="alert"></p>
+        </fieldset>
+
+        <fieldset class="field datetime-field">
+          <legend>Event End Date and Time</legend>
+          <div class="datetime-row">
+            <div class="date-input">
+              <label for="endDate" class="visually-hidden">End date</label>
+              <input type="date" id="endDate" name="endDate" aria-describedby="endDateError">
+            </div>
+            <div class="time-input" id="endTimeGroup">
+              <label for="endHour" class="visually-hidden">End hour</label>
+              <select id="endHour" name="endHour" aria-label="End hour">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12" selected>12</option>
+              </select>
+              <span class="time-sep" aria-hidden="true">:</span>
+              <label for="endMinute" class="visually-hidden">End minute</label>
+              <select id="endMinute" name="endMinute" aria-label="End minute"></select>
+              <label for="endAmPm" class="visually-hidden">End AM or PM</label>
+              <select id="endAmPm" name="endAmPm" aria-label="End AM or PM">
+                <option value="AM">AM</option>
+                <option value="PM" selected>PM</option>
+              </select>
+            </div>
+          </div>
+          <p class="field-error" id="endDateError" role="alert"></p>
+          <p class="field-hint">Leave blank for a one-hour event starting at the time above.</p>
+        </fieldset>
+
+        <div class="field">
+          <label for="eventDescription">Description</label>
+          <textarea id="eventDescription" name="eventDescription" rows="4" maxlength="2000"></textarea>
+        </div>
+
+        <p class="form-error" id="formError" role="alert"></p>
+
+        <button type="submit" class="btn-generate" id="generateBtn">Generate QR Code</button>
+      </form>
+    </section>
+
+    <section class="result-card" aria-labelledby="result-heading">
+      <h2 id="result-heading">Your QR Code</h2>
+
+      <div class="result-placeholder" id="resultPlaceholder">
+        <div class="placeholder-icon" aria-hidden="true">▦</div>
+        <p>Fill out the form and generate your QR code — it'll appear here, ready to scan or download.</p>
+      </div>
+
+      <div class="result-output" id="resultOutput" hidden>
+        <div class="qr-wrapper" id="qrWrapper">
+          <div class="qr-image" id="qrContainer"></div>
+        </div>
+        <p class="result-caption">Scan with a phone camera to add this event to your calendar.</p>
+        <button type="button" class="btn-download" id="downloadBtn">Download QR Code (PNG)</button>
+      </div>
+
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p>Everything happens in your browser — no event details are sent anywhere.</p>
+  <p>&copy; 2026 William, <a href="https://websweetweb.us">websweetweb.us</a></p>
+</footer>
+
+<script src="./scripts/nav.js"></script>
+<script src="./scripts/qrcode.js"></script>
+<script src="./scripts/scripts.js"></script>
+</body>
+</html>

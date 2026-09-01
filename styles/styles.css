@@ -1,0 +1,668 @@
+/*
+ * Event QR Code Creator — shared stylesheet, loaded by index.html.
+ *
+ * Single page: a header, a two-column layout (event form + QR result panel)
+ * that stacks to one column below 860px, and a footer. Organized as:
+ * variables/reset, header, layout shell, form styling, result panel,
+ * buttons, footer, then responsive overrides at the bottom.
+ */
+
+:root {
+  --bg: #F3F4F9;
+  --surface: #FFFFFF;
+  --border: #DEE1EA;
+  --text: #1B1E2B;
+  --text-dim: #5B5F73;
+  --text-faint: #7A7E93;
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
+  --primary-contrast: #FFFFFF;
+  --error: #B3132C;
+  --error-bg: #FDEDEF;
+  --radius: 12px;
+  --shadow: 0 1px 2px rgba(27, 30, 43, 0.04), 0 8px 24px rgba(27, 30, 43, 0.06);
+}
+
+* { box-sizing: border-box; }
+
+/* Several elements below (.time-input, .result-placeholder, .result-output)
+   are shown/hidden purely by toggling the `hidden` attribute in scripts.js,
+   but also carry their own `display: flex` rule for when they're visible.
+   Both have the same specificity as the browser's built-in `[hidden] {
+   display: none }`, and author CSS wins that tie — so without this, the
+   `display: flex` rule would silently override `hidden` and the element
+   would stay on screen. This makes `hidden` authoritative everywhere. */
+[hidden] { display: none !important; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+h1, h2, legend {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Keyboard-focus ring, consistent across all interactive elements */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--primary);
+  color: var(--primary-contrast);
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 0 8px 0;
+  z-index: 100;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   Site navigation
+   ============================================================
+   Deep "metallic" purple: a diagonal gradient with a brighter band through
+   the middle to read as a brushed-metal sheen rather than a flat fill.
+   Every stop was checked against white text and comes in at 7:1+ contrast
+   (WCAG AA needs 4.5:1), so the text stays readable no matter which part
+   of the gradient it happens to sit over. */
+.site-nav {
+  position: relative;
+  background: linear-gradient(135deg, #2E1065 0%, #5B21B6 40%, #6D28D9 50%, #5B21B6 60%, #2E1065 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-brand {
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.75rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.nav-link:hover,
+.nav-link[aria-current="page"] {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nav-toggle span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #fff;
+  border-radius: 2px;
+}
+
+@media (max-width: 500px) {
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #2E1065;
+    padding: 0.25rem 1.5rem 0.5rem;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links li {
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .nav-link {
+    display: block;
+    padding: 0.85rem 0;
+  }
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+.site-header {
+  padding: 2.5rem 1.5rem 1.5rem;
+  text-align: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.brand-mark {
+  color: var(--primary);
+  font-size: 1.3rem;
+}
+
+.header-tagline {
+  margin: 0.5rem 0 0;
+  color: var(--text-dim);
+  font-size: 1rem;
+}
+
+/* Plain page-title header for content pages (About, Contact) — same
+   placement and spacing as .site-header above, sitting outside the boxed
+   .content-card rather than as a heading inside it, but without the
+   brand-mark icon or tagline that are specific to the home page's hero. */
+.page-header {
+  padding: 2.5rem 1.5rem 1.5rem;
+  text-align: center;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.form-card,
+.result-card,
+.content-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.75rem;
+}
+
+.content-card {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.content-card h1 {
+  margin: 0 0 1rem;
+  font-size: 1.4rem;
+}
+
+.content-card p {
+  margin: 0 0 1rem;
+  color: var(--text-dim);
+}
+
+.content-card p:last-child {
+  margin-bottom: 0;
+}
+
+.content-card a {
+  color: var(--primary);
+}
+
+.result-card {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.form-card h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.4rem;
+}
+
+.result-card h2 {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+}
+
+.form-intro {
+  margin: 0 0 1.5rem;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+/* ============================================================
+   Form fields
+   ============================================================ */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field > label,
+fieldset.field > legend {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+fieldset.field {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+fieldset.field > legend {
+  padding: 0;
+  margin-bottom: 0.4rem;
+}
+
+.required {
+  color: var(--error);
+}
+
+input[type="text"],
+input[type="date"],
+select,
+textarea {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+}
+
+input[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.field-row {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.field-row .location-field {
+  flex: 1 1 200px;
+}
+
+.toggle-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.toggle-text {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #E4E6EF;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.toggle-switch[aria-checked="true"] {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(27, 30, 43, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.toggle-switch[aria-checked="true"] .toggle-thumb {
+  transform: translateX(20px);
+}
+
+.checkbox-field {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--primary);
+}
+
+.checkbox-field label {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.datetime-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.date-input {
+  flex: 1 1 160px;
+}
+
+.date-input input {
+  width: 100%;
+}
+
+.time-input {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 1 1 220px;
+}
+
+.time-input select {
+  width: auto;
+  min-width: 4.2rem;
+  flex: 1;
+}
+
+.time-sep {
+  color: var(--text-faint);
+  font-weight: 600;
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--text-faint);
+  font-size: 0.82rem;
+}
+
+.field-error,
+.form-error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.85rem;
+}
+
+.field-error:empty,
+.form-error:empty {
+  display: none;
+}
+
+.form-error:not(:empty) {
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn-generate,
+.btn-download {
+  font: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-generate {
+  background: var(--primary);
+  color: var(--primary-contrast);
+  align-self: flex-start;
+}
+
+.btn-generate:hover {
+  background: var(--primary-hover);
+}
+
+/* Fires on every click of Generate QR Code, pass or fail validation --
+   it's acknowledging the press itself, not the outcome. */
+.btn-generate.flash-press {
+  animation: btn-press-flash 0.5s ease;
+}
+
+@keyframes btn-press-flash {
+  0%, 100% { background-color: var(--primary); }
+  35% { background-color: var(--primary-hover); }
+}
+
+.btn-download {
+  background: var(--surface);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  width: 100%;
+}
+
+.btn-download:hover {
+  background: #EEF0FF;
+}
+
+/* ============================================================
+   Result panel
+   ============================================================ */
+.result-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--text-faint);
+}
+
+.placeholder-icon {
+  font-size: 2.5rem;
+  color: var(--border);
+}
+
+.result-placeholder p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.result-output {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.qr-wrapper {
+  width: 100%;
+  max-width: 260px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: #fff;
+}
+
+/* Fires once a freshly-generated QR code lands in the panel, so it's
+   obvious something just appeared rather than being missed on scroll. */
+.qr-wrapper.flash-new {
+  animation: qr-new-flash 0.7s ease;
+}
+
+@keyframes qr-new-flash {
+  0%, 100% { background-color: #fff; }
+  30% { background-color: #EEF0FF; }
+}
+
+.qr-image {
+  width: 100%;
+  line-height: 0;
+}
+
+/* Slow fade/scale-in for the QR graphic itself, separate from the quick
+   .qr-wrapper background flash above -- the flash says "look here", this
+   is the graceful 1s reveal of the code once you're looking. */
+.qr-image.reveal-in {
+  animation: qr-reveal-in 1s ease;
+}
+
+@keyframes qr-reveal-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.qr-image svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.result-caption {
+  margin: 0;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.site-footer {
+  text-align: center;
+  padding: 1.5rem 1.5rem 2.5rem;
+  color: var(--text-faint);
+  font-size: 0.85rem;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer p + p {
+  margin-top: 0.35rem;
+}
+
+.site-footer a {
+  color: var(--primary);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .result-card {
+    position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-generate.flash-press,
+  .qr-wrapper.flash-new,
+  .qr-image.reveal-in {
+    animation: none;
+  }
+}
