@@ -325,9 +325,62 @@ form {
 }
 
 .field > label,
+.label-row label,
 fieldset.field > legend {
   font-weight: 600;
   font-size: 0.9rem;
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--error);
+  background: var(--surface);
+  color: var(--error);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  cursor: help;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 0.4rem;
+  width: max-content;
+  max-width: 220px;
+  background: var(--text);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.4;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 10;
+}
+
+.info-icon:hover + .tooltip,
+.info-icon:focus-visible + .tooltip {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 fieldset.field {

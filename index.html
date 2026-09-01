@@ -54,7 +54,11 @@
 
         <div class="field-row">
           <div class="field location-field">
-            <label for="eventLocation" id="locationLabel">Event Location</label>
+            <div class="label-row">
+              <label for="eventLocation" id="locationLabel">Event Location</label>
+              <button type="button" class="info-icon" aria-label="Location help" aria-describedby="locationHelpTip">?</button>
+              <span class="tooltip" role="tooltip" id="locationHelpTip">Physical address or digital meeting link</span>
+            </div>
             <input type="text" id="eventLocation" name="eventLocation" maxlength="200" autocomplete="off">
             <select id="mooseLodgeLocation" name="mooseLodgeLocation" aria-labelledby="locationLabel" hidden>
               <option value="">Select a lodge…</option>
