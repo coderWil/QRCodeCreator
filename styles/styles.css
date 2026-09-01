@@ -343,16 +343,11 @@ fieldset.field > legend {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 1.05rem;
-  height: 1.05rem;
-  border-radius: 50%;
-  border: 1.5px solid var(--error);
-  background: var(--surface);
-  color: var(--error);
-  font-size: 0.68rem;
-  font-weight: 700;
-  line-height: 1;
+  border: none;
+  background: none;
   padding: 0;
+  font-size: 0.95rem;
+  line-height: 1;
   cursor: help;
 }
 
@@ -371,16 +366,19 @@ fieldset.field > legend {
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
   opacity: 0;
+  visibility: hidden;
   transform: translateY(4px);
   pointer-events: none;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
   z-index: 10;
 }
 
 .info-icon:hover + .tooltip,
 .info-icon:focus-visible + .tooltip {
   opacity: 1;
+  visibility: visible;
   transform: translateY(0);
+  transition-delay: 0s;
 }
 
 fieldset.field {
