@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About | Event QR Code Creator</title>
-<meta name="description" content="About the Event QR Code Creator — a free tool that turns event details into a scannable calendar QR code.">
+<meta name="description" content="About the Event QR Code Creator &ndash; a free tool that turns event details into a scannable calendar QR code.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,9 +16,9 @@
 
 <nav class="site-nav">
   <div class="nav-inner">
-    <a href="./index.html" class="nav-brand">WebSweetWeb Event QR</a>
+    <a href="./index.html" class="nav-brand">WebSweetWeb QR Gen</a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="./index.html" class="nav-link">Event QR</a></li>
+      <li><a href="./index.html" class="nav-link">QR Gen</a></li>
       <li><a href="./about.html" class="nav-link" aria-current="page">About</a></li>
       <li><a href="./contact.html" class="nav-link">Contact</a></li>
       <li><a href="https://websweetweb.us" class="nav-link">WSW</a></li>
@@ -35,9 +35,25 @@
 
 <main id="main-content">
   <section class="content-card">
-    <p>Event QR Code Creator is a free tool for turning event details into a QR code that adds the event straight to a calendar app when scanned — no app, sign-up, or account required.</p>
-    <p>Fill in a title, location, and start/end time, and it builds a standard iCalendar (.ics) event and encodes it directly into the QR code. Point a phone camera at it, and most phones offer an "Add to Calendar" action right away.</p>
-    <p>Everything runs in your browser. Event details are never sent to a server. Event Location is remembered between visits using your browser's local storage, so it's already filled in next time — that value stays on your device too and is never sent anywhere.</p>
+
+    <div class="tab-list" role="tablist" aria-label="QR code type">
+      <button type="button" class="tab-button" id="eventTab" role="tab" aria-selected="true" aria-controls="eventPanel">Event ICS</button>
+      <button type="button" class="tab-button" id="websiteTab" role="tab" aria-selected="false" aria-controls="websitePanel" tabindex="-1">Website</button>
+    </div>
+
+    <div class="tab-panel" id="eventPanel" role="tabpanel" aria-labelledby="eventTab" tabindex="0">
+      <p>Event QR Code Creator is a free tool for turning event details into a QR code that adds the event straight to a calendar app when scanned &ndash; no app, sign-up, or account required.</p>
+      <p>Fill in a title, location, and start/end time, and it builds a standard iCalendar (.ics) event and encodes it directly into the QR code. Point a phone camera at it, and most phones offer an "Add to Calendar" action right away.</p>
+      <p>Everything runs in your browser. Event details are never sent to a server. Event Location is remembered between visits using your browser's local storage, so it's already filled in next time &ndash; that value stays on your device too and is never sent anywhere.</p>
+    </div>
+
+    <div class="tab-panel" id="websitePanel" role="tabpanel" aria-labelledby="websiteTab" tabindex="0" hidden>
+      <p>Website mode skips calendars entirely &ndash; it encodes the URL you type directly into the QR code, so the code itself is the link, nothing more.</p>
+      <p>That makes it a <strong>static</strong> QR code. A "dynamic" QR service instead points the code at a short link on its own server and only redirects you from there to the real destination &ndash; which means that server can change where you land, track every scan, or shut the link off later, all without reprinting the code.</p>
+      <p>A static code has none of that in between. Scanning it sends a phone straight to the exact URL you entered &ndash; no intermediary, no forwarding hop. No one else sees when or how often it gets scanned, and no one but you can ever redirect or disable it, because there's no service in the middle to do so.</p>
+      <p>The tradeoff: since the URL is baked into the pattern itself, changing the destination later means generating a new code.</p>
+    </div>
+
     <p>Built by WebSweetWeb.</p>
   </section>
 </main>
@@ -47,5 +63,6 @@
 </footer>
 
 <script src="./scripts/nav.js"></script>
+<script src="./scripts/about.js"></script>
 </body>
 </html>

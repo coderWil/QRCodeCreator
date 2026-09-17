@@ -4,10 +4,10 @@
 // the payload of a QR code, and renders that QR code as inline SVG. Phone
 // camera apps that recognize VCALENDAR/VEVENT text in a scanned QR code
 // (iOS Camera, most Android scanners) offer an "Add to Calendar" action
-// directly — no server or file download required for that flow to work.
+// directly &ndash; no server or file download required for that flow to work.
 //
 // qrcode.js (vendored, ./scripts/qrcode.js) only *registers* a UTF-8 byte
-// encoder, it doesn't use it by default — its default stringToBytes just
+// encoder, it doesn't use it by default &ndash; its default stringToBytes just
 // masks each char code to 8 bits, which mangles anything outside ASCII.
 // Switch it over before any addData() call so accented text, curly quotes,
 // etc. in titles/descriptions survive the round trip.
@@ -17,6 +17,14 @@ qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
   'use strict';
 
   var form = document.getElementById('eventForm');
+  var qrTypeSelect = document.getElementById('qrType');
+  var eventFields = document.getElementById('eventFields');
+  var websiteFields = document.getElementById('websiteFields');
+  var websiteUrlInput = document.getElementById('websiteUrl');
+  var websiteUrlError = document.getElementById('websiteUrlError');
+  var formHeading = document.getElementById('form-heading');
+  var formIntro = document.getElementById('formIntro');
+  var resultCaption = document.getElementById('resultCaption');
   var titleInput = document.getElementById('eventTitle');
   var locationInput = document.getElementById('eventLocation');
   var mooseLodgeSelect = document.getElementById('mooseLodgeLocation');
@@ -64,9 +72,48 @@ qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
     mooseLodgeSelection: 'eventQrCreator.mooseLodgeSelection'
   };
 
+  var TYPE_COPY = {
+    event: {
+      heading: 'Event Details',
+      intro: 'Fill in your event, then generate a QR code anyone can scan to add it to their calendar.',
+      caption: 'Scan with a phone camera to add this event to your calendar.'
+    },
+    website: {
+      heading: 'Website Details',
+      intro: 'Enter a URL, then generate a QR code anyone can scan to open it in their browser.',
+      caption: 'Scan with a phone camera to open this website.'
+    }
+  };
+
   populateMinutes(startMinuteSelect);
   populateMinutes(endMinuteSelect);
   restoreSavedLocation();
+  setQrTypeMode(qrTypeSelect.value);
+
+  qrTypeSelect.addEventListener('change', function () {
+    setQrTypeMode(qrTypeSelect.value);
+  });
+
+  // Swaps the form between the Event ICS fields and the single Website URL
+  // field based on the top-of-page type selector. Both share the same
+  // generate button and result panel &ndash; only the fields collected and the
+  // payload built from them differ.
+  function setQrTypeMode(type) {
+    var isWebsite = type === 'website';
+    eventFields.hidden = isWebsite;
+    websiteFields.hidden = !isWebsite;
+
+    var copy = TYPE_COPY[isWebsite ? 'website' : 'event'];
+    formHeading.textContent = copy.heading;
+    formIntro.textContent = copy.intro;
+    resultCaption.textContent = copy.caption;
+
+    formError.textContent = '';
+    clearFieldError(websiteUrlInput, websiteUrlError);
+    clearFieldError(titleInput, eventTitleError);
+    clearFieldError(startDateInput, startDateError);
+    clearFieldError(endDateInput, endDateError);
+  }
 
   allDayCheckbox.addEventListener('change', function () {
     startTimeGroup.hidden = allDayCheckbox.checked;
@@ -94,7 +141,7 @@ qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
   });
 
   // Swaps Event Location between the free-text input and the LA County
-  // lodge dropdown — only one is ever the "live" control read on submit.
+  // lodge dropdown &ndash; only one is ever the "live" control read on submit.
   // Shared by the toggle's click handler and the on-load restore below so
   // both stay in sync with a single source of truth for the visual state.
   function setMooseLodgeMode(turningOn) {
@@ -137,7 +184,7 @@ qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
     try {
       window.localStorage.setItem(key, value);
     } catch (err) {
-      // Private browsing / disabled storage — persistence just won't work.
+      // Private browsing / disabled storage &ndash; persistence just won't work.
     }
   }
 
@@ -161,6 +208,45 @@ qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
   }
 
   function handleSubmit() {
+    if (qrTypeSelect.value === 'website') {
+      handleWebsiteSubmit();
+    } else {
+      handleEventSubmit();
+    }
+  }
+
+  function handleWebsiteSubmit() {
+    clearFieldError(websiteUrlInput, websiteUrlError);
+    formError.textContent = '';
+
+    var rawUrl = websiteUrlInput.value.trim();
+
+    if (!rawUrl) {
+      showFieldError(websiteUrlInput, websiteUrlError, 'A URL is required.');
+      return;
+    }
+
+    // A bare "example.com" is a common thing to type here but isn't a valid
+    // absolute URL (and most scanners won't treat it as a link) without a
+    // scheme, so assume https:// when the user left one off.
+    var url = /^[a-z][a-z0-9+.-]*:/i.test(rawUrl) ? rawUrl : 'https://' + rawUrl;
+
+    try {
+      new URL(url);
+    } catch (err) {
+      showFieldError(websiteUrlInput, websiteUrlError, 'Enter a valid website address.');
+      return;
+    }
+
+    try {
+      renderQrCode(url, 'QR code that opens ' + url + ' when scanned', 'Open website: ' + url);
+      currentFileSlug = slugify(url.replace(/^https?:\/\//i, ''));
+    } catch (err) {
+      formError.textContent = 'This URL is too long to fit in a QR code.';
+    }
+  }
+
+  function handleEventSubmit() {
     clearFieldError(titleInput, eventTitleError);
     clearFieldError(startDateInput, startDateError);
     clearFieldError(endDateInput, endDateError);
@@ -239,23 +325,23 @@ qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
     var icsText = buildIcs(evt);
 
     try {
-      renderQrCode(icsText, title);
+      renderQrCode(icsText, 'QR code that adds "' + title + '" to your calendar when scanned', 'Add to calendar: ' + title);
       currentFileSlug = slugify(title);
     } catch (err) {
       formError.textContent = 'This event’s details are too long to fit in a QR code. Try shortening the description.';
     }
   }
 
-  function renderQrCode(icsText, title) {
+  function renderQrCode(payload, altText, titleText) {
     var qr = qrcode(0, 'M');
-    qr.addData(icsText);
+    qr.addData(payload);
     qr.make();
 
     var svg = qr.createSvgTag({
       cellSize: 6,
       margin: 4,
-      alt: 'QR code that adds "' + title + '" to your calendar when scanned',
-      title: 'Add to calendar: ' + title
+      alt: altText,
+      title: titleText
     });
 
     qrContainer.innerHTML = svg;
@@ -267,15 +353,15 @@ qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
     flashElement(qrContainer, 'reveal-in');
 
     // requestAnimationFrame so the layout has reflowed after the hidden
-    // toggle above before we measure it — otherwise resultCard's rect can
+    // toggle above before we measure it &ndash; otherwise resultCard's rect can
     // still reflect its old (placeholder) height.
     window.requestAnimationFrame(scrollToResultIfBelowForm);
   }
 
   // On narrow viewports the two-column .layout grid (styles.css) stacks to
   // one column, pushing the result card below the form instead of beside
-  // it. Detect that purely from geometry — the result card's top sitting
-  // at/after the form card's bottom edge — rather than duplicating the
+  // it. Detect that purely from geometry &ndash; the result card's top sitting
+  // at/after the form card's bottom edge &ndash; rather than duplicating the
   // CSS breakpoint here, then scroll the newly-generated QR code into view.
   function scrollToResultIfBelowForm() {
     var formRect = formCard.getBoundingClientRect();
@@ -400,7 +486,7 @@ qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
   // Date/time helpers
   //
   // DTSTART/DTEND are emitted as "floating" local time (no Z, no TZID)
-  // since the form has no timezone field — calendar apps interpret these
+  // since the form has no timezone field &ndash; calendar apps interpret these
   // in the viewer's own local timezone, which matches what the organizer
   // typed without requiring them to think about UTC offsets.
   // ---------------------------------------------------------------
@@ -448,7 +534,7 @@ qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
   }
 
   // Re-triggers a CSS animation class even if it's already present (e.g. the
-  // user clicks Generate again before the previous flash finished) — the
+  // user clicks Generate again before the previous flash finished) &ndash; the
   // reflow forced by reading offsetWidth is what makes the restart work.
   function flashElement(el, className) {
     el.classList.remove(className);

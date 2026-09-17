@@ -1,5 +1,5 @@
 /*
- * Event QR Code Creator — shared stylesheet, loaded by index.html.
+ * Event QR Code Creator &ndash; shared stylesheet, loaded by index.html.
  *
  * Single page: a header, a two-column layout (event form + QR result panel)
  * that stacks to one column below 860px, and a footer. Organized as:
@@ -29,7 +29,7 @@
    are shown/hidden purely by toggling the `hidden` attribute in scripts.js,
    but also carry their own `display: flex` rule for when they're visible.
    Both have the same specificity as the browser's built-in `[hidden] {
-   display: none }`, and author CSS wins that tie — so without this, the
+   display: none }`, and author CSS wins that tie &ndash; so without this, the
    `display: flex` rule would silently override `hidden` and the element
    would stay on screen. This makes `hidden` authoritative everywhere. */
 [hidden] { display: none !important; }
@@ -223,7 +223,7 @@ textarea:focus-visible {
   font-size: 1rem;
 }
 
-/* Plain page-title header for content pages (About, Contact) — same
+/* Plain page-title header for content pages (About, Contact) &ndash; same
    placement and spacing as .site-header above, sitting outside the boxed
    .content-card rather than as a heading inside it, but without the
    brand-mark icon or tagline that are specific to the home page's hero. */
@@ -246,6 +246,19 @@ main {
   max-width: 1080px;
   margin: 0 auto;
   padding: 0 1.5rem 3rem;
+}
+
+.type-selector-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.type-field {
+  max-width: 320px;
 }
 
 .layout {
@@ -282,6 +295,43 @@ main {
 
 .content-card p:last-child {
   margin-bottom: 0;
+}
+
+.tab-list {
+  display: flex;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+
+.tab-button {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.6rem 0.25rem;
+  margin-bottom: -1px;
+  cursor: pointer;
+}
+
+.tab-button:hover {
+  color: var(--text);
+}
+
+.tab-button[aria-selected="true"] {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Each tab panel's own last paragraph isn't really the card's last element
+   (the "Built by WebSweetWeb" line follows both panels) -- .content-card
+   p:last-child above would otherwise strip its bottom margin too, since
+   :last-child only checks position among its own parent's children. */
+.tab-panel p:last-child {
+  margin-bottom: 1rem;
 }
 
 .content-card a {
